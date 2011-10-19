@@ -12,6 +12,7 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 library
-  exposed-modules:     Data.STM.LinkedList.Internal
-  build-depends:       base == 4.*
-                     , stm
+    exposed-modules:    Data.STM.LinkedList.Internal
+    build-depends:      base == 4.*
+                      , stm
+    ghc-options:        -Wall

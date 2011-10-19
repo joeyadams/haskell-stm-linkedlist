@@ -9,18 +9,19 @@ import Control.Concurrent.STM
 import System.IO (fixIO)
 
 -- | Circular doubly linked list.
---
--- Warning: the value of the list anchor is undefined.
-newtype LinkedList a = LinkedList (Node a)
+newtype LinkedList a = LinkedList (NodePtr a)
 
 data Node a
     = Node
-        { nodePrev  :: TVar (Node a)
-        , nodeNext  :: TVar (Node a)
+        { nodePrev  :: NodePtr a
+        , nodeNext  :: NodePtr a
         , nodeValue :: a
+            -- ^ Warning: the value of a 'LinkedList' anchor is undefined.
         }
 
-emptyAnchor :: TVar (Node a) -> Node a
+type NodePtr a = TVar (Node a)
+
+emptyAnchor :: NodePtr a -> Node a
 emptyAnchor ptr =
     Node { nodePrev  = ptr
          , nodeNext  = ptr
@@ -29,10 +30,12 @@ emptyAnchor ptr =
 
 empty :: STM (LinkedList a)
 empty = do
-    anchor <- newTVar Node undefined
+    anchor <- newTVar undefined
     writeTVar anchor $ emptyAnchor anchor
     return $ LinkedList anchor
 
 -- | IO version of 'empty'.
 emptyIO :: IO (LinkedList a)
-emptyIO = fixIO $ \(LinkedList anchor) -> newTVar Node $ emptyAnchor anchor
+emptyIO = do
+    anchor <- fixIO (newTVarIO . emptyAnchor)
+    return $ LinkedList anchor
