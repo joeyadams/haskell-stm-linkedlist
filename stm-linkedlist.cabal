@@ -16,5 +16,5 @@ library
     other-modules:      Data.STM.LinkedList.Internal
     build-depends:      base == 4.*
                       , stm
-    ghc-options:        -Wall
+    ghc-options:        -Wall -O2
     other-extensions:   BangPatterns

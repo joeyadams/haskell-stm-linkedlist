@@ -37,7 +37,7 @@ null (LinkedList list_head) = do
 length :: LinkedList a -> STM Int
 length (LinkedList list_head) = foldlHelper (\a _ -> a + 1) 0 nodeNext list_head
 
--- | O(1). Create an empty linked list.
+-- | /O(1)/. Create an empty linked list.
 empty :: STM (LinkedList a)
 empty = do
     prev_ptr <- newTVar undefined
@@ -47,7 +47,7 @@ empty = do
     writeTVar next_ptr node
     return $ LinkedList node
 
--- | Version of 'empty' that can be used in the 'IO' monad.
+-- | /O(1)/. Version of 'empty' that can be used in the 'IO' monad.
 emptyIO :: IO (LinkedList a)
 emptyIO = do
     node <- fixIO $ \node -> do
@@ -66,19 +66,19 @@ insertBetween v left right = do
     writeTVar (nodePrev right) node
     return node
 
--- | /O(1)/ Add a node to the beginning of a linked list.
+-- | /O(1)/. Add a node to the beginning of a linked list.
 prepend :: a -> LinkedList a -> STM (Node a)
 prepend v (LinkedList list_head) = do
     right <- readTVar $ nodeNext list_head
     insertBetween v list_head right
 
--- | /O(1)/ Add a node to the end of a linked list.
+-- | /O(1)/. Add a node to the end of a linked list.
 append :: a -> LinkedList a -> STM (Node a)
 append v (LinkedList list_head) = do
     left <- readTVar $ nodePrev list_head
     insertBetween v left list_head
 
--- | /O(1)/ Insert an item before the given node.
+-- | /O(1)/. Insert an item before the given node.
 insertBefore :: a -> Node a -> STM (Node a)
 insertBefore v node = do
     left <- readTVar $ nodePrev node
@@ -86,7 +86,7 @@ insertBefore v node = do
         then error "insertBefore: node removed from list"
         else insertBetween v left node
 
--- | /O(1)/ Insert an item after the given node.
+-- | /O(1)/. Insert an item after the given node.
 insertAfter :: a -> Node a -> STM (Node a)
 insertAfter v node = do
     right <- readTVar $ nodeNext node
@@ -94,7 +94,7 @@ insertAfter v node = do
         then error "insertAfter: node removed from list"
         else insertBetween v node right
 
--- | /O(1)/ Remove a node from whatever 'LinkedList' it is in.  If the node has
+-- | /O(1)/. Remove a node from whatever 'LinkedList' it is in.  If the node has
 -- already been removed, this is a no-op.
 delete :: Node a -> STM ()
 delete node = do
@@ -107,7 +107,7 @@ delete node = do
     writeTVar (nodePrev node) node
     writeTVar (nodeNext node) node
 
--- | /O(1)/ Extract the value of a node.
+-- | /O(1)/. Extract the value of a node.
 value :: Node a -> a
 value node = case nodeValue node of
                  Just v  -> v
@@ -122,12 +122,12 @@ stepHelper step node = do
             Just _  -> return $ Just node'
             Nothing -> return Nothing
 
--- | /O(1)/ Get the previous node.  Return 'Nothing' if this is the first item,
+-- | /O(1)/. Get the previous node.  Return 'Nothing' if this is the first item,
 -- or if this node has been 'delete'd from its list.
 prev :: Node a -> STM (Maybe (Node a))
 prev = stepHelper nodePrev
 
--- | /O(1)/ Get the next node.  Return 'Nothing' if this is the last item,
+-- | /O(1)/. Get the next node.  Return 'Nothing' if this is the last item,
 -- or if this node has been 'delete'd from its list.
 next :: Node a -> STM (Maybe (Node a))
 next = stepHelper nodeNext
@@ -150,10 +150,10 @@ foldlHelper f z nodeStep start =
                 Nothing -> return accum
                 Just v  -> loop (f accum v) node'
 
--- | /O(n)/ Return all of the items in a 'LinkedList'.
+-- | /O(n)/. Return all of the items in a 'LinkedList'.
 toList :: LinkedList a -> STM [a]
 toList (LinkedList list_head) = foldlHelper (flip (:)) [] nodePrev list_head
 
--- | /O(n)/ Return all of the items in a 'LinkedList', in reverse order.
+-- | /O(n)/. Return all of the items in a 'LinkedList', in reverse order.
 toListRev :: LinkedList a -> STM [a]
 toListRev (LinkedList list_head) = foldlHelper (flip (:)) [] nodeNext list_head
