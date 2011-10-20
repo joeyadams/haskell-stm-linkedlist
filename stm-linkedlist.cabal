@@ -1,6 +1,6 @@
 name:                stm-linkedlist
 version:             0.1.0.0
-synopsis:            Doubly linked lists for STM
+synopsis:            Doubly linked lists for STM (software transactional memory)
 -- description:         
 license:             BSD3
 license-file:        LICENSE
@@ -16,5 +16,5 @@ library
     other-modules:      Data.STM.LinkedList.Internal
     build-depends:      base == 4.*
                       , stm
-    ghc-options:        -Wall -O2
+    ghc-options:        -Wall
     other-extensions:   BangPatterns
