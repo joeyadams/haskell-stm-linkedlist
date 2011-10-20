@@ -5,10 +5,8 @@ import Control.Concurrent.STM
 import Data.Maybe (isJust, isNothing)
 import System.IO (fixIO)
 
--- | Mutable, doubly linked list, supporting efficient insertion and removal.
---
--- This is implemented internally as a circular list with a designated \"list
--- head\" node.
+-- | List handle.  Used for insertion and traversal starting at the beginning
+-- or end of the list.
 newtype LinkedList a = LinkedList (Node a)
 
 -- | Unwrap the list head, a special 'Node' with the following properties:
@@ -27,8 +25,15 @@ newtype LinkedList a = LinkedList (Node a)
 listHead :: LinkedList a -> Node a
 listHead (LinkedList h) = h
 
--- | Used for traversal and removal.  A 'Node' contains an immutable value of
--- type @a@, and 'TVar's that point to the previous and next nodes.
+-- | List node.  Used for insertion, traversal, and removal starting at a given
+-- item in the list.
+--
+-- A Node contains an immutable value of type @a@, and 'TVar's that point to
+-- the previous and next nodes.
+--
+-- Node equality can be likened to pointer equality in C.  Two Node values are
+-- considered equal if and only if they were created with the same insertion
+-- operation.
 data Node a
     = Node
         { nodePrev  :: NodePtr a

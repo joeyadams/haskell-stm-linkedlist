@@ -4,7 +4,8 @@
 -- License:     BSD3
 -- Maintainer:  joeyadams3.14159@gmail.com
 --
--- Doubly linked lists for use with STM (software transactional memory).
+-- Mutable, doubly linked lists for use with STM (software transactional
+-- memory).  Provides efficient random insertion and removal.
 --
 -- This module is usually imported qualified:
 --
