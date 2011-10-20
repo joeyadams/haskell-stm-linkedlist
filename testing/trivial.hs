@@ -190,6 +190,69 @@ testInsertValuePrevNext = do
     okList "testInsertValuePrevNext" list [1,3]
     ok remove_correct "Removing node2 made node1' and node3 neighbors, and made node2 have no neighbors"
 
+-- | Make sure list items are not invalidated by subsequent operations.
+testToList :: IO ()
+testToList = do
+    list <- LinkedList.emptyIO :: IO (LinkedList Int)
+    nodes <- atomically $ mapM (flip LinkedList.append list) [1..1000]
+    items <- atomically $ LinkedList.toList list
+    atomically $ mapM_ LinkedList.delete nodes
+    ok (items == [1..1000]) "testToList: toList"
+
+    list' <- LinkedList.emptyIO :: IO (LinkedList Int)
+    nodes' <- atomically $ mapM (flip LinkedList.append list') [1..1000]
+    items' <- atomically $ LinkedList.toListRev list'
+    atomically $ mapM_ LinkedList.delete nodes'
+    ok (items' == reverse [1..1000]) "testToList: toListRev"
+
+testListHead :: IO ()
+testListHead = do
+    list <- LinkedList.emptyIO :: IO (LinkedList Int)
+
+    let checkStart = do
+            a <- atomically $ (LinkedList.next . LinkedList.listHead) list
+            b <- atomically $ LinkedList.start list
+            ok (a == b) "testListHead: checkStart"
+
+        checkEnd = do
+            a <- atomically $ (LinkedList.prev . LinkedList.listHead) list
+            b <- atomically $ LinkedList.end list
+            ok (a == b) "testListHead: checkEnd"
+
+        checkValue = okError "testListHead: checkValue"
+                   $ evaluate $ (LinkedList.value . LinkedList.listHead) list
+
+        checkDelete = okError "testListHead: checkDelete"
+                    $ atomically $ (LinkedList.delete . LinkedList.listHead) list
+
+        checkAll = do
+            checkStart
+            checkEnd
+            checkValue
+            checkDelete
+
+    checkAll
+
+    node2 <- atomically $ (LinkedList.insertBefore 2 . LinkedList.listHead) list
+    okList "testListHead" list [2]
+    checkAll
+
+    node3 <- atomically $ (LinkedList.insertBefore 3 . LinkedList.listHead) list
+    okList "testListHead" list [2,3]
+    checkAll
+
+    node1 <- atomically $ (LinkedList.insertAfter 1 . LinkedList.listHead) list
+    okList "testListHead" list [1,2,3]
+    checkAll
+
+    atomically $ mapM_ LinkedList.delete [node1, node2, node3]
+    okList "testListHead" list []
+    checkAll
+
+    _ <- atomically $ (LinkedList.insertAfter 0 . LinkedList.listHead) list
+    okList "testListHead" list [0]
+    checkAll
+
 main :: IO ()
 main = do
     testEmpty
@@ -200,3 +263,5 @@ main = do
     testInsertBefore
     testInsertAfter
     testInsertValuePrevNext
+    testToList
+    testListHead
