@@ -13,12 +13,11 @@
 module Data.STM.LinkedList (
     -- * The LinkedList type
     LinkedList,
+    listHead,
 
     -- * The Node type
     Node,
     value,
-    prev,
-    next,
 
     -- * Query
     null,
@@ -36,6 +35,12 @@ module Data.STM.LinkedList (
 
     -- ** Deletion
     delete,
+
+    -- * Traversal
+    prev,
+    next,
+    start,
+    end,
 
     -- * Conversion
     toList,
